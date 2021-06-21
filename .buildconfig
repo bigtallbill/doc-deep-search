@@ -1,0 +1,10 @@
+[default]
+name=Default
+runtime=host
+config-opts=
+run-opts=
+prefix=/home/bigtallbill/.cache/gnome-builder/install/dir_search/host
+app-id=
+postbuild=
+prebuild=
+default=true
