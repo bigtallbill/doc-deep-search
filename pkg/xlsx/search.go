@@ -2,22 +2,22 @@ package xlsx
 
 import (
 	"archive/zip"
-	"io"
 	"errors"
+	"io"
 	"io/ioutil"
 	"regexp"
 )
 
 func Contains(path, term string) (bool, int, error) {
 	data, err := ReadDocxFile(path)
-
 	if err != nil {
 		return false, 0, err
 	}
 
-	var validID = regexp.MustCompile(`(?i)` + term)
-
-	var matches = validID.FindAllString(data, -1)
+	var (
+		validID = regexp.MustCompile(`(?i)` + term)
+		matches = validID.FindAllString(data, -1)
+	)
 
 	if occurrences := len(matches); occurrences == 0 {
 		return false, occurrences, nil
@@ -31,7 +31,9 @@ func ReadDocxFile(path string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	zipData := ZipFile{data: reader}
+
 	return ReadDocx(zipData)
 }
 
@@ -63,18 +65,22 @@ type ZipData interface {
 
 func readText(files []*zip.File) (text string, err error) {
 	var documentFile *zip.File
+
 	documentFile, err = retrieveWordDoc(files)
 	if err != nil {
 		return text, err
 	}
+
 	var documentReader io.ReadCloser
+
 	documentReader, err = documentFile.Open()
 	if err != nil {
 		return text, err
 	}
 
 	text, err = wordDocToString(documentReader)
-	return
+
+	return text, err
 }
 
 func retrieveWordDoc(files []*zip.File) (file *zip.File, err error) {
@@ -83,10 +89,12 @@ func retrieveWordDoc(files []*zip.File) (file *zip.File, err error) {
 			file = f
 		}
 	}
+
 	if file == nil {
 		err = errors.New("sharedStrings.xml file not found")
 	}
-	return
+
+	return file, err
 }
 
 func wordDocToString(reader io.Reader) (string, error) {
@@ -94,6 +102,6 @@ func wordDocToString(reader io.Reader) (string, error) {
 	if err != nil {
 		return "", err
 	}
+
 	return string(b), nil
 }
-
